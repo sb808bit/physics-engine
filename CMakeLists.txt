@@ -4,12 +4,22 @@ project(PhysicsEngine)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Collect all source files
-file(GLOB_RECURSE SRC_FILES "src/*.cpp")
+# Common source files
+set(COMMON_SRC
+    src/core/RigidBody.cpp
+    src/core/Vec2.cpp
+    src/dynamics/Integrator.cpp
+    src/collision/CollisionDetector.cpp
+)
 
-add_executable(physics_engine ${SRC_FILES})
+# Main simulation
+add_executable(physics_engine src/main.cpp ${COMMON_SRC})
 
-# If you want to add tests later
-enable_testing()
-# add_executable(tests tests/test_integrators.cpp)
-# target_link_libraries(tests physics_engine)
+# Benchmarks
+add_executable(benchmark src/benchmark.cpp ${COMMON_SRC})
+add_executable(spring_benchmark src/spring_benchmark.cpp ${COMMON_SRC})
+
+# Compiler flags
+target_compile_options(physics_engine PRIVATE -Wall -Wextra)
+target_compile_options(benchmark PRIVATE -Wall -Wextra)
+target_compile_options(spring_benchmark PRIVATE -Wall -Wextra)
