@@ -60,3 +60,23 @@ This project demonstrates the core concepts used in robotics physics engines lik
 Supash Bhat
 UC Berkeley - Physics, Astrophysics, Music
 GitHub: sb808bit
+
+## Python Interactive Demo
+
+For the full interactive experience with all features, run the Python version:
+
+```bash
+git clone https://github.com/supashbhat/physics-engine.git
+cd physics-engine
+pip install pygame
+python3 visualize_realtime.py
+```
+
+**Features in Python version:**
+- ✅ Click and drag to throw balls with velocity
+- ✅ Real-time gravity slider
+- ✅ WASD gravity direction control
+- ✅ **Window shake inertia** — drag the window to shake all balls
+- ✅ Energy display with trails
+- ✅ SPACE to add balls, R to reset, C to clear
+- ✅ Toggle between energy and controls display
