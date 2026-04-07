@@ -2,7 +2,7 @@
 
 Physics Engine is a computational physics sandbox built around rigid-body simulation, numerical integration, and interactive visualization. It combines a C++ core with Python and browser-facing surfaces so the same physical ideas can be explored through benchmarks, local sandboxes, and public demos.
 
-The project started as a way to compare integrators and collision handling in a more tangible setting. It now also includes the beginning of a Barnes-Hut workstream for many-body gravity and scaling experiments.
+The project started as a way to compare integrators and collision handling in a more tangible setting. It now also includes a Barnes-Hut workstream for many-body gravity, scaling experiments, and approximation-quality analysis.
 
 ## Highlights
 
@@ -11,7 +11,7 @@ The project started as a way to compare integrators and collision handling in a 
 - Benchmark tooling for energy drift and spring-system behavior
 - Polished real-time Python sandbox with scene presets, pause/step controls, and live energy feedback
 - Browser-facing 2D and 3D demo surfaces connected to the portfolio
-- Barnes-Hut benchmark tooling for `O(N^2)` vs `O(N log N)` gravity comparison
+- Barnes-Hut exact-vs-approximation compare lab with quadtree overlay, divergence tracking, and generated scaling/theta benchmark plots
 
 ## Quick Start
 
@@ -43,10 +43,25 @@ python3 spring_visualize.py
 ### Run the Barnes-Hut benchmark
 
 ```bash
-python3 barnes_hut_benchmark.py --theta 0.6
+python3 barnes_hut_benchmark.py --counts 240 480 960 1600 --theta 0.6 --write-summary --json-out docs/barnes_hut_latest.json
+python3 barnes_hut_plot.py docs/barnes_hut_latest.json --output docs/barnes_hut_benchmark.png
 ```
 
-Add `--write-summary` to save a benchmark snapshot into `docs/`.
+### Run the Barnes-Hut theta sweep
+
+```bash
+python3 barnes_hut_theta_sweep.py --count 960 --steps 12 --thetas 0.35 0.50 0.65 0.80 1.00 --write-summary --json-out docs/barnes_hut_theta_sweep.json
+python3 barnes_hut_theta_plot.py docs/barnes_hut_theta_sweep.json --output docs/barnes_hut_theta_sweep.png
+```
+
+### Run the Barnes-Hut compare lab
+
+```bash
+pip install pygame
+python3 barnes_hut_visualizer.py
+```
+
+This launches a split-view local surface with exact `O(N^2)` gravity on the left and Barnes-Hut on the right.
 
 ## Main Components
 
@@ -80,9 +95,19 @@ The Barnes-Hut additions live in:
 
 - `barnes_hut.py`
 - `barnes_hut_benchmark.py`
+- `barnes_hut_plot.py`
+- `barnes_hut_theta_sweep.py`
+- `barnes_hut_theta_plot.py`
+- `barnes_hut_visualizer.py`
 - `docs/barnes_hut_notes.md`
+- `docs/barnes_hut_latest.txt`
+- `docs/barnes_hut_latest.json`
+- `docs/barnes_hut_benchmark.png`
+- `docs/barnes_hut_theta_sweep.txt`
+- `docs/barnes_hut_theta_sweep.json`
+- `docs/barnes_hut_theta_sweep.png`
 
-This part of the repo is focused on scaling from small-body interaction toward large gravitational systems through spatial partitioning, center-of-mass approximation, and timing/error tradeoff analysis.
+This part of the repo is focused on scaling from small-body interaction toward large gravitational systems through spatial partitioning, center-of-mass approximation, timing/error tradeoff analysis, and direct visual comparison against the exact solver.
 
 ## Sandbox Controls
 
@@ -114,7 +139,13 @@ This part of the repo is focused on scaling from small-body interaction toward l
 - `spring_visualize.py` - spring benchmark visualization
 - `barnes_hut.py` - Barnes-Hut quadtree, exact gravity baseline, and stepping helpers
 - `barnes_hut_benchmark.py` - timing/error comparison script for many-body gravity
+- `barnes_hut_plot.py` - plot generation for benchmark JSON output
+- `barnes_hut_theta_sweep.py` - theta-vs-speed/error sweep for approximation tuning
+- `barnes_hut_theta_plot.py` - plot generation for theta sweep JSON output
+- `barnes_hut_visualizer.py` - split-view local compare lab for exact vs Barnes-Hut stepping
 - `docs/barnes_hut_notes.md` - Barnes-Hut implementation notes and next steps
+- `docs/barnes_hut_benchmark.png` - current benchmark figure
+- `docs/barnes_hut_theta_sweep.png` - current theta sweep figure
 - `ROADMAP.md` - project direction and future milestones
 
 ## Why This Project Exists
@@ -125,7 +156,7 @@ The aim is to make computational physics feel both rigorous and explorable: nume
 
 Current directions include:
 
-- Barnes-Hut visualization and larger `N` benchmarking
+- Barnes-Hut browser-facing visualization, larger `N` benchmarking, and broader particle distributions
 - Broader collision and constraint systems
 - More unified architecture between the C++ core and interactive surfaces
 - Stronger browser-facing demos tied into the portfolio

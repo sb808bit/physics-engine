@@ -1,0 +1,98 @@
+{
+  "count": 960,
+  "steps": 12,
+  "thetas": [
+    0.35,
+    0.5,
+    0.65,
+    0.8,
+    1.0
+  ],
+  "results": [
+    {
+      "theta": 0.35,
+      "force": {
+        "approx_time": 0.07981258304789662,
+        "exact_time": 0.1453314172104001,
+        "speedup": 1.8209085793299626,
+        "rms_error": 0.022530572459149172,
+        "node_count": 2813,
+        "max_depth": 10,
+        "occupied_leaves": 960
+      },
+      "loop": {
+        "exact_runtime": 2.092944041825831,
+        "approx_runtime": 1.0407973332330585,
+        "speedup": 2.0109045008065682
+      }
+    },
+    {
+      "theta": 0.5,
+      "force": {
+        "approx_time": 0.05096420785412192,
+        "exact_time": 0.14519558288156986,
+        "speedup": 2.8489716409832635,
+        "rms_error": 0.06027149953688125,
+        "node_count": 2813,
+        "max_depth": 10,
+        "occupied_leaves": 960
+      },
+      "loop": {
+        "exact_runtime": 2.1004421249963343,
+        "approx_runtime": 0.6341375410556793,
+        "speedup": 3.312281625055074
+      }
+    },
+    {
+      "theta": 0.65,
+      "force": {
+        "approx_time": 0.036955374758690596,
+        "exact_time": 0.1438529579900205,
+        "speedup": 3.892612615332534,
+        "rms_error": 0.13114706606084017,
+        "node_count": 2813,
+        "max_depth": 10,
+        "occupied_leaves": 960
+      },
+      "loop": {
+        "exact_runtime": 2.0785048329271376,
+        "approx_runtime": 0.4625946250744164,
+        "speedup": 4.493145229676575
+      }
+    },
+    {
+      "theta": 0.8,
+      "force": {
+        "approx_time": 0.028519917279481888,
+        "exact_time": 0.1627246248535812,
+        "speedup": 5.705648556373981,
+        "rms_error": 0.30023309511885277,
+        "node_count": 2813,
+        "max_depth": 10,
+        "occupied_leaves": 960
+      },
+      "loop": {
+        "exact_runtime": 2.0867471247911453,
+        "approx_runtime": 0.36099154222756624,
+        "speedup": 5.780598381653153
+      }
+    },
+    {
+      "theta": 1.0,
+      "force": {
+        "approx_time": 0.020675458945333958,
+        "exact_time": 0.14350566687062383,
+        "speedup": 6.940869716607196,
+        "rms_error": 0.5026739957363356,
+        "node_count": 2813,
+        "max_depth": 10,
+        "occupied_leaves": 960
+      },
+      "loop": {
+        "exact_runtime": 2.0930456249043345,
+        "approx_runtime": 0.275237999856472,
+        "speedup": 7.604493660017121
+      }
+    }
+  ]
+}

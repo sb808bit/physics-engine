@@ -3,22 +3,28 @@ from __future__ import annotations
 
 import argparse
 from copy import deepcopy
+import json
 from pathlib import Path
 import time
 
 from barnes_hut import (
-    barnes_hut_accelerations,
+    barnes_hut_tree_and_accelerations,
+    collect_tree_stats,
     exact_accelerations,
     leapfrog_step,
     make_disc_particles,
     rms_force_error,
 )
 
+REPO_ROOT = Path(__file__).resolve().parent
+DOCS_DIR = REPO_ROOT / "docs"
+
 
 def benchmark_force_pass(particles, theta):
     start = time.perf_counter()
-    approx = barnes_hut_accelerations(particles, theta=theta)
+    tree, approx = barnes_hut_tree_and_accelerations(particles, theta=theta)
     approx_time = time.perf_counter() - start
+    stats = collect_tree_stats(tree)
 
     start = time.perf_counter()
     exact = exact_accelerations(particles)
@@ -29,6 +35,9 @@ def benchmark_force_pass(particles, theta):
         "exact_time": exact_time,
         "speedup": exact_time / max(approx_time, 1e-9),
         "rms_error": rms_force_error(exact, approx),
+        "node_count": stats.node_count,
+        "max_depth": stats.max_depth,
+        "occupied_leaves": stats.occupied_leaves,
     }
 
 
@@ -64,6 +73,7 @@ def main():
     parser.add_argument("--seed", type=int, default=7, help="Random seed")
     parser.add_argument("--counts", type=int, nargs="+", default=[250, 500, 1000, 2000], help="Particle counts")
     parser.add_argument("--write-summary", action="store_true", help="Write a benchmark snapshot into docs/")
+    parser.add_argument("--json-out", type=Path, default=None, help="Optional JSON output path")
     args = parser.parse_args()
 
     print("\nBarnes-Hut Benchmark")
@@ -78,10 +88,11 @@ def main():
         ("Force BH (ms)", 16),
         ("Force speedup", 16),
         ("RMS accel err", 16),
+        ("Nodes/depth", 16),
         ("Loop speedup", 14),
     ]
     print(format_row(headers))
-    print("-" * 96)
+    print("-" * 116)
 
     results = []
     for count in args.counts:
@@ -96,6 +107,7 @@ def main():
             (f"{force_result['approx_time'] * 1000:0.2f}", 16),
             (f"{force_result['speedup']:0.2f}x", 16),
             (f"{force_result['rms_error']:0.4f}", 16),
+            (f"{force_result['node_count']}/{force_result['max_depth']}", 16),
             (f"{loop_result['speedup']:0.2f}x", 14),
         ]
         print(format_row(row))
@@ -108,7 +120,7 @@ def main():
     print("Use smaller theta values for more accuracy and larger values for more aggressive approximation.")
 
     if args.write_summary:
-        artifact = Path("docs") / "barnes_hut_latest.txt"
+        artifact = DOCS_DIR / "barnes_hut_latest.txt"
         artifact.parent.mkdir(exist_ok=True)
         lines = [
             "Barnes-Hut Benchmark Snapshot",
@@ -120,10 +132,29 @@ def main():
             lines.append(
                 f"N={count}: force speedup {force_result['speedup']:0.2f}x, "
                 f"loop speedup {loop_result['speedup']:0.2f}x, "
-                f"RMS accel error {force_result['rms_error']:0.4f}"
+                f"RMS accel error {force_result['rms_error']:0.4f}, "
+                f"nodes/depth {force_result['node_count']}/{force_result['max_depth']}"
             )
         artifact.write_text("\n".join(lines) + "\n")
         print(f"Saved summary to {artifact}")
+
+    if args.json_out is not None:
+        args.json_out.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "theta": args.theta,
+            "steps": args.steps,
+            "counts": args.counts,
+            "results": [
+                {
+                    "count": count,
+                    "force": force_result,
+                    "loop": loop_result,
+                }
+                for count, force_result, loop_result in results
+            ],
+        }
+        args.json_out.write_text(json.dumps(payload, indent=2) + "\n")
+        print(f"Saved JSON to {args.json_out}")
 
 
 if __name__ == "__main__":

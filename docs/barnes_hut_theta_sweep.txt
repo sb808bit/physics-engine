@@ -1,0 +1,9 @@
+Barnes-Hut Theta Sweep
+Particle count: 960
+Steps: 12
+
+theta=0.35: force speedup 1.82x, loop speedup 2.01x, RMS accel error 0.0225, nodes/depth 2813/10
+theta=0.50: force speedup 2.85x, loop speedup 3.31x, RMS accel error 0.0603, nodes/depth 2813/10
+theta=0.65: force speedup 3.89x, loop speedup 4.49x, RMS accel error 0.1311, nodes/depth 2813/10
+theta=0.80: force speedup 5.71x, loop speedup 5.78x, RMS accel error 0.3002, nodes/depth 2813/10
+theta=1.00: force speedup 6.94x, loop speedup 7.60x, RMS accel error 0.5027, nodes/depth 2813/10

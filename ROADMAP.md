@@ -17,23 +17,25 @@ Already in place:
 
 ### 1. Barnes-Hut and many-body scaling
 
-Current status: underway
+Current status: active local compare lab + scaling/theta benchmark pipeline
 
 - 2D Barnes-Hut quadtree implementation
 - Exact-force baseline for correctness checks
 - Benchmark script for force-pass timing and RMS acceleration error
-- First-pass docs around `theta`, approximation quality, and scaling goals
+- Plot generation for benchmark artifacts
+- Theta sweep for speed-vs-error tuning
+- Side-by-side local compare lab with quadtree overlay and divergence tracking
 
 Next steps:
 
-- Add a visual N-body surface instead of benchmark output alone
+- Add a browser-facing N-body surface instead of local tooling alone
 - Scale benchmarks to larger particle counts
-- Produce cleaner benchmark artifacts and plots
+- Compare multiple particle distributions beyond the disc swirl baseline
 - Connect many-body work to a public-facing simulation demo
 
 ### 2. Simulation UX
 
-Current status: strong local foundation
+Current status: strong local foundation plus Barnes-Hut compare tooling
 
 - Scene presets
 - Live gravity, time-scale, and trail controls

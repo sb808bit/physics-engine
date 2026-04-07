@@ -1,0 +1,8 @@
+Barnes-Hut Benchmark Snapshot
+Theta: 0.60
+Steps: 12
+
+N=240: force speedup 1.27x, loop speedup 1.45x, RMS accel error 0.0241, nodes/depth 705/8
+N=480: force speedup 2.06x, loop speedup 2.41x, RMS accel error 0.0529, nodes/depth 1461/9
+N=960: force speedup 3.73x, loop speedup 4.24x, RMS accel error 0.1139, nodes/depth 2813/10
+N=1600: force speedup 5.29x, loop speedup 6.24x, RMS accel error 0.1555, nodes/depth 4737/10

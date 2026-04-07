@@ -32,6 +32,15 @@ class Bounds:
         )
 
 
+@dataclass
+class TreeStats:
+    node_count: int = 0
+    internal_count: int = 0
+    leaf_count: int = 0
+    occupied_leaves: int = 0
+    max_depth: int = 0
+
+
 class QuadNode:
     def __init__(self, bounds: Bounds):
         self.bounds = bounds
@@ -84,6 +93,8 @@ class QuadNode:
 
 def compute_bounds(particles: Iterable[Particle]) -> Bounds:
     particles = list(particles)
+    if not particles:
+        return Bounds(0.0, 0.0, 1.0)
     min_x = min(p.x for p in particles)
     max_x = max(p.x for p in particles)
     min_y = min(p.y for p in particles)
@@ -154,13 +165,31 @@ def exact_accelerations(particles: list[Particle], softening: float = 0.08) -> l
     return accelerations
 
 
+def barnes_hut_tree_and_accelerations(
+    particles: list[Particle],
+    theta: float = 0.6,
+    softening: float = 0.08,
+) -> tuple[QuadNode, list[tuple[float, float]]]:
+    tree = build_tree(particles)
+    accelerations = [barnes_hut_acceleration(p, tree, theta=theta, softening=softening) for p in particles]
+    return tree, accelerations
+
+
 def barnes_hut_accelerations(
     particles: list[Particle],
     theta: float = 0.6,
     softening: float = 0.08,
 ) -> list[tuple[float, float]]:
-    tree = build_tree(particles)
-    return [barnes_hut_acceleration(p, tree, theta=theta, softening=softening) for p in particles]
+    _, accelerations = barnes_hut_tree_and_accelerations(particles, theta=theta, softening=softening)
+    return accelerations
+
+
+def advance_particles(particles: list[Particle], accelerations: list[tuple[float, float]], dt: float) -> None:
+    for particle, (ax, ay) in zip(particles, accelerations):
+        particle.vx += ax * dt
+        particle.vy += ay * dt
+        particle.x += particle.vx * dt
+        particle.y += particle.vy * dt
 
 
 def leapfrog_step(
@@ -175,12 +204,7 @@ def leapfrog_step(
         if method == "barnes-hut"
         else exact_accelerations(particles, softening=softening)
     )
-
-    for particle, (ax, ay) in zip(particles, accelerations):
-        particle.vx += ax * dt
-        particle.vy += ay * dt
-        particle.x += particle.vx * dt
-        particle.y += particle.vy * dt
+    advance_particles(particles, accelerations, dt)
 
 
 def make_disc_particles(count: int, radius: float = 24.0, seed: int = 7) -> list[Particle]:
@@ -207,3 +231,51 @@ def rms_force_error(exact: list[tuple[float, float]], approx: list[tuple[float, 
         total += dx * dx + dy * dy
         count += 1
     return math.sqrt(total / max(count, 1))
+
+
+def position_rms_difference(left: list[Particle], right: list[Particle]) -> float:
+    total = 0.0
+    count = 0
+    for a, b in zip(left, right):
+        dx = a.x - b.x
+        dy = a.y - b.y
+        total += dx * dx + dy * dy
+        count += 1
+    return math.sqrt(total / max(count, 1))
+
+
+def total_energy(particles: list[Particle], softening: float = 0.08) -> float:
+    kinetic = sum(0.5 * particle.mass * (particle.vx * particle.vx + particle.vy * particle.vy) for particle in particles)
+    potential = 0.0
+    for index, particle in enumerate(particles):
+        for other in particles[index + 1:]:
+            dx = other.x - particle.x
+            dy = other.y - particle.y
+            distance = math.sqrt(dx * dx + dy * dy + softening * softening)
+            potential -= G * particle.mass * other.mass / distance
+    return kinetic + potential
+
+
+def clone_particles(particles: Iterable[Particle]) -> list[Particle]:
+    return [Particle(p.x, p.y, p.vx, p.vy, p.mass) for p in particles]
+
+
+def collect_tree_stats(node: QuadNode, depth: int = 0) -> TreeStats:
+    stats = TreeStats(node_count=1, max_depth=depth)
+
+    if node.children is None:
+        stats.leaf_count = 1
+        if node.particle is not None:
+            stats.occupied_leaves = 1
+        return stats
+
+    stats.internal_count = 1
+    assert node.children is not None
+    for child in node.children:
+        child_stats = collect_tree_stats(child, depth + 1)
+        stats.node_count += child_stats.node_count
+        stats.internal_count += child_stats.internal_count
+        stats.leaf_count += child_stats.leaf_count
+        stats.occupied_leaves += child_stats.occupied_leaves
+        stats.max_depth = max(stats.max_depth, child_stats.max_depth)
+    return stats
