@@ -136,7 +136,9 @@ This part of the repo is focused on scaling from small-body interaction toward l
 - `visualize_realtime.py` - polished Pygame sandbox
 - `visualize.py` - trajectory plotting
 - `energy_analysis.py` - free-fall energy comparison
+- `energy_comparison.png` - current free-fall energy comparison figure
 - `spring_visualize.py` - spring benchmark visualization
+- `spring_comparison.png` - current spring benchmark figure
 - `barnes_hut.py` - Barnes-Hut quadtree, exact gravity baseline, and stepping helpers
 - `barnes_hut_benchmark.py` - timing/error comparison script for many-body gravity
 - `barnes_hut_plot.py` - plot generation for benchmark JSON output
